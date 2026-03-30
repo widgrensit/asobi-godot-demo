@@ -79,7 +79,8 @@ func _make_button(text: String, color: Color) -> Button:
 
 
 func _show_results() -> void:
-	var result := GameConfig.match_result
+	var payload := GameConfig.match_result
+	var result: Dictionary = payload.get("result", {})
 	var standings: Array = result.get("standings", [])
 	var winner: String = result.get("winner", "")
 	var my_id := Asobi.player_id
@@ -109,7 +110,8 @@ func _submit_and_fetch_leaderboard() -> void:
 
 	# Find my kills from standings
 	var my_kills := 0
-	var standings: Array = GameConfig.match_result.get("standings", [])
+	var result_data: Dictionary = GameConfig.match_result.get("result", {})
+	var standings: Array = result_data.get("standings", [])
 	for entry in standings:
 		if entry.get("player_id", "") == Asobi.player_id:
 			my_kills = int(entry.get("kills", 0))

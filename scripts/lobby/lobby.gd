@@ -5,6 +5,10 @@ var _find_btn: Button
 var _cancel_btn: Button
 var _searching := false
 var _search_time := 0.0
+var _countdown_active := false
+var _countdown_value := 3
+var _countdown_timer := 0.0
+var _countdown_label: Label
 
 
 func _ready() -> void:
@@ -16,11 +20,23 @@ func _process(delta: float) -> void:
 	if _searching:
 		_search_time += delta
 		_status_label.text = "Searching for match... %ds" % int(_search_time)
+	if _countdown_active:
+		_countdown_timer -= delta
+		if _countdown_timer <= 0.0:
+			_countdown_value -= 1
+			if _countdown_value <= 0:
+				_countdown_label.text = "GO!"
+				_countdown_active = false
+				await get_tree().create_timer(0.5).timeout
+				get_tree().change_scene_to_file("res://scenes/arena.tscn")
+			else:
+				_countdown_label.text = str(_countdown_value)
+				_countdown_timer = 1.0
 
 
 func _build_ui() -> void:
 	var bg := ColorRect.new()
-	bg.color = Color(0.1, 0.1, 0.15)
+	bg.color = GameConfig.COL_OCEAN
 	bg.set_anchors_preset(PRESET_FULL_RECT)
 	add_child(bg)
 
@@ -32,32 +48,36 @@ func _build_ui() -> void:
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(vbox)
 
-	# Player info
 	var player_label := Label.new()
 	player_label.text = "Player: %s" % Asobi.player_id
 	player_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	player_label.add_theme_color_override("font_color", Color.GRAY)
+	player_label.add_theme_color_override("font_color", GameConfig.COL_MUTED)
 	player_label.add_theme_font_size_override("font_size", 18)
 	vbox.add_child(player_label)
 
-	# Status
 	_status_label = Label.new()
 	_status_label.text = "Connecting..."
 	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_status_label.add_theme_font_size_override("font_size", 24)
+	_status_label.add_theme_color_override("font_color", GameConfig.COL_TEXT)
 	vbox.add_child(_status_label)
 
-	# Find match button
-	_find_btn = _make_button("FIND MATCH", Color(0.0, 0.8, 0.8), Vector2(250, 60))
+	_find_btn = _make_button("FIND MATCH", GameConfig.COL_PRIMARY, Vector2(250, 60))
 	_find_btn.pressed.connect(_on_find_match)
 	_find_btn.disabled = true
 	vbox.add_child(_find_btn)
 
-	# Cancel button
-	_cancel_btn = _make_button("CANCEL", Color(0.8, 0.2, 0.2), Vector2(250, 60))
+	_cancel_btn = _make_button("CANCEL", GameConfig.COL_ERROR, Vector2(250, 60))
 	_cancel_btn.pressed.connect(_on_cancel)
 	_cancel_btn.visible = false
 	vbox.add_child(_cancel_btn)
+
+	_countdown_label = Label.new()
+	_countdown_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_countdown_label.add_theme_font_size_override("font_size", 96)
+	_countdown_label.add_theme_color_override("font_color", GameConfig.COL_SECONDARY)
+	_countdown_label.visible = false
+	vbox.add_child(_countdown_label)
 
 
 func _make_button(text: String, color: Color, min_size: Vector2) -> Button:
@@ -108,7 +128,14 @@ func _on_cancel() -> void:
 
 func _on_matched(_payload: Dictionary) -> void:
 	_searching = false
-	get_tree().change_scene_to_file("res://scenes/arena.tscn")
+	_find_btn.visible = false
+	_cancel_btn.visible = false
+	_status_label.visible = false
+	_countdown_label.visible = true
+	_countdown_value = 3
+	_countdown_label.text = str(_countdown_value)
+	_countdown_timer = 1.0
+	_countdown_active = true
 
 
 func _on_error(payload: Dictionary) -> void:

@@ -12,9 +12,8 @@ func _ready() -> void:
 
 
 func _build_ui() -> void:
-	# Dark background
 	var bg := ColorRect.new()
-	bg.color = Color(0.1, 0.1, 0.15)
+	bg.color = GameConfig.COL_OCEAN
 	bg.set_anchors_preset(PRESET_FULL_RECT)
 	add_child(bg)
 
@@ -24,7 +23,7 @@ func _build_ui() -> void:
 	panel.custom_minimum_size = Vector2(400, 350)
 	panel.position = Vector2(-200, -175)
 	var style := StyleBoxFlat.new()
-	style.bg_color = Color(0.15, 0.15, 0.2, 0.9)
+	style.bg_color = GameConfig.COL_SURFACE
 	style.corner_radius_top_left = 8
 	style.corner_radius_top_right = 8
 	style.corner_radius_bottom_left = 8
@@ -45,6 +44,7 @@ func _build_ui() -> void:
 	title.text = "ASOBI ARENA"
 	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	title.add_theme_font_size_override("font_size", 42)
+	title.add_theme_color_override("font_color", GameConfig.COL_PRIMARY)
 	vbox.add_child(title)
 
 	# Spacer
@@ -71,18 +71,18 @@ func _build_ui() -> void:
 	btn_row.add_theme_constant_override("separation", 10)
 	vbox.add_child(btn_row)
 
-	_login_btn = _make_button("LOGIN", Color(0.0, 0.8, 0.8))
+	_login_btn = _make_button("LOGIN", GameConfig.COL_PRIMARY)
 	_login_btn.pressed.connect(_on_login)
 	btn_row.add_child(_login_btn)
 
-	_register_btn = _make_button("REGISTER", Color(0.0, 0.8, 0.4))
+	_register_btn = _make_button("REGISTER", GameConfig.COL_TERTIARY)
 	_register_btn.pressed.connect(_on_register)
 	btn_row.add_child(_register_btn)
 
 	# Status
 	_status_label = Label.new()
 	_status_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
-	_status_label.add_theme_color_override("font_color", Color.YELLOW)
+	_status_label.add_theme_color_override("font_color", GameConfig.COL_SECONDARY)
 	_status_label.add_theme_font_size_override("font_size", 18)
 	vbox.add_child(_status_label)
 

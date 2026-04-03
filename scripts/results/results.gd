@@ -3,6 +3,9 @@ extends Control
 var _title_label: Label
 var _standings_label: Label
 var _leaderboard_label: Label
+var _next_label: Label
+var _auto_return_timer := 3.0
+var _auto_return := true
 
 
 func _ready() -> void:
@@ -11,52 +14,65 @@ func _ready() -> void:
 	_submit_and_fetch_leaderboard()
 
 
+func _process(delta: float) -> void:
+	if _auto_return:
+		_auto_return_timer -= delta
+		_next_label.text = "Next round in %ds..." % maxi(int(_auto_return_timer) + 1, 0)
+		if _auto_return_timer <= 0.0:
+			_auto_return = false
+			get_tree().change_scene_to_file("res://scenes/lobby.tscn")
+
+
 func _build_ui() -> void:
 	var bg := ColorRect.new()
-	bg.color = Color(0.1, 0.1, 0.15)
+	bg.color = GameConfig.COL_OCEAN
 	bg.set_anchors_preset(PRESET_FULL_RECT)
 	add_child(bg)
 
 	var vbox := VBoxContainer.new()
 	vbox.set_anchors_preset(PRESET_CENTER)
-	vbox.custom_minimum_size = Vector2(500, 500)
-	vbox.position = Vector2(-250, -250)
+	vbox.custom_minimum_size = Vector2(500, 550)
+	vbox.position = Vector2(-250, -275)
 	vbox.add_theme_constant_override("separation", 16)
 	vbox.alignment = BoxContainer.ALIGNMENT_CENTER
 	add_child(vbox)
 
-	# Title
 	_title_label = Label.new()
 	_title_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_title_label.add_theme_font_size_override("font_size", 48)
 	vbox.add_child(_title_label)
 
-	# Standings
 	_standings_label = Label.new()
 	_standings_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_standings_label.add_theme_font_size_override("font_size", 18)
+	_standings_label.add_theme_color_override("font_color", GameConfig.COL_TEXT)
 	_standings_label.custom_minimum_size = Vector2(500, 150)
 	vbox.add_child(_standings_label)
 
-	# Leaderboard
 	_leaderboard_label = Label.new()
 	_leaderboard_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	_leaderboard_label.add_theme_font_size_override("font_size", 16)
+	_leaderboard_label.add_theme_color_override("font_color", GameConfig.COL_MUTED)
 	_leaderboard_label.custom_minimum_size = Vector2(400, 150)
 	vbox.add_child(_leaderboard_label)
 
-	# Buttons
+	_next_label = Label.new()
+	_next_label.text = "Next round in 3s..."
+	_next_label.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	_next_label.add_theme_font_size_override("font_size", 20)
+	_next_label.add_theme_color_override("font_color", GameConfig.COL_SECONDARY)
+	vbox.add_child(_next_label)
+
 	var btn_row := HBoxContainer.new()
 	btn_row.alignment = BoxContainer.ALIGNMENT_CENTER
 	btn_row.add_theme_constant_override("separation", 20)
 	vbox.add_child(btn_row)
 
-	var play_btn := _make_button("PLAY AGAIN", Color(0.0, 0.8, 0.8))
-	play_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/lobby.tscn"))
-	btn_row.add_child(play_btn)
-
-	var quit_btn := _make_button("QUIT", Color(0.8, 0.2, 0.2))
-	quit_btn.pressed.connect(func(): get_tree().change_scene_to_file("res://scenes/login.tscn"))
+	var quit_btn := _make_button("QUIT TO MENU", GameConfig.COL_ERROR)
+	quit_btn.pressed.connect(func():
+		_auto_return = false
+		get_tree().change_scene_to_file("res://scenes/login.tscn")
+	)
 	btn_row.add_child(quit_btn)
 
 
@@ -85,15 +101,13 @@ func _show_results() -> void:
 	var winner: String = result.get("winner", "")
 	var my_id := Asobi.player_id
 
-	# Title
 	if winner == my_id:
 		_title_label.text = "VICTORY!"
-		_title_label.add_theme_color_override("font_color", Color.YELLOW)
+		_title_label.add_theme_color_override("font_color", GameConfig.COL_TERTIARY)
 	else:
 		_title_label.text = "DEFEAT"
-		_title_label.add_theme_color_override("font_color", Color.RED)
+		_title_label.add_theme_color_override("font_color", GameConfig.COL_ERROR)
 
-	# Standings
 	var lines: Array[String] = []
 	for entry in standings:
 		var pid: String = entry.get("player_id", "")
@@ -108,7 +122,6 @@ func _show_results() -> void:
 func _submit_and_fetch_leaderboard() -> void:
 	_leaderboard_label.text = "Loading leaderboard..."
 
-	# Find my kills from standings
 	var my_kills := 0
 	var result_data: Dictionary = GameConfig.match_result.get("result", {})
 	var standings: Array = result_data.get("standings", [])
@@ -117,10 +130,8 @@ func _submit_and_fetch_leaderboard() -> void:
 			my_kills = int(entry.get("kills", 0))
 			break
 
-	# Submit score
 	await Asobi.leaderboards.submit_score(GameConfig.LEADERBOARD_ID, my_kills)
 
-	# Fetch top 10
 	var resp: Dictionary = await Asobi.leaderboards.get_top(GameConfig.LEADERBOARD_ID, 10)
 	if resp.has("error"):
 		_leaderboard_label.text = "Failed to load leaderboard"

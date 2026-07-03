@@ -100,7 +100,7 @@ func _make_button(text: String, color: Color, min_size: Vector2) -> Button:
 
 func _connect_realtime() -> void:
 	Asobi.realtime.connected.connect(_on_connected)
-	Asobi.realtime.matchmaker_matched.connect(_on_matched)
+	Asobi.realtime.match_matched.connect(_on_matched)
 	Asobi.realtime.error_received.connect(_on_error)
 	Asobi.realtime.connect_to_server()
 
@@ -148,7 +148,7 @@ func _on_error(payload: Dictionary) -> void:
 func _exit_tree() -> void:
 	if Asobi.realtime.connected.is_connected(_on_connected):
 		Asobi.realtime.connected.disconnect(_on_connected)
-	if Asobi.realtime.matchmaker_matched.is_connected(_on_matched):
-		Asobi.realtime.matchmaker_matched.disconnect(_on_matched)
+	if Asobi.realtime.match_matched.is_connected(_on_matched):
+		Asobi.realtime.match_matched.disconnect(_on_matched)
 	if Asobi.realtime.error_received.is_connected(_on_error):
 		Asobi.realtime.error_received.disconnect(_on_error)

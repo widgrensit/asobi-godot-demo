@@ -1,9 +1,8 @@
 extends Node
 
 const HOST := "localhost"
-# The arena game runs on asobi_arena_lua (:8085), not the minimal
-# sdk_demo_backend (:8084) which has no "arena" mode - see README Prerequisites.
-const PORT := 8085
+# The bundled lua/ arena game runs locally via `asobi dev` on :8084.
+const PORT := 8084
 const GAME_MODE := "arena"
 const LEADERBOARD_ID := "arena_kills"
 

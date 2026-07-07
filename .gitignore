@@ -9,3 +9,6 @@ Thumbs.db
 
 # Symlinked addon (managed externally)
 addons/asobi
+
+# asobi dev local backend
+.asobi/

@@ -14,14 +14,20 @@ Top-down arena shooter demo for the [Asobi](https://github.com/widgrensit/asobi)
 ### Prerequisites
 
 - [Godot 4.5+](https://godotengine.org/)
-- An [`asobi_arena_lua`](https://github.com/widgrensit/asobi_arena_lua) backend running locally:
+- The [asobi CLI](https://github.com/widgrensit/asobi-cli) and Docker (for `asobi dev`).
 
-   ```bash
-   git clone https://github.com/widgrensit/asobi_arena_lua
-   cd asobi_arena_lua && docker compose up -d
-   ```
+### Run the backend
 
-   Server listens on `http://localhost:8085`. (This demo plays the *full* arena game - boons, modifiers, voting, bots - so it needs the arena Lua, not the minimal [`sdk_demo_backend`](https://github.com/widgrensit/sdk_demo_backend).) On Windows and macOS this needs Docker Desktop running; on Windows use the WSL2 backend.
+The full arena game logic (boons, modifiers, voting, bots) is bundled in `lua/`.
+Start it locally with one command:
+
+```bash
+asobi dev
+```
+
+That serves the backend on `http://localhost:8084` and hot-reloads the `lua/` on save.
+On Windows and macOS you need Docker Desktop running; on Windows use the WSL2 backend.
+Leave it running.
 
 ### Install SDK
 
@@ -39,9 +45,9 @@ If you plan to edit the SDK in place, link it instead of copying:
 
 ### Run
 
-1. Make sure `asobi_arena_lua` is up (see Prerequisites).
-2. Open this project in Godot 4.5 and run it (F5). This is the same on every OS. New
-   to Godot? See the [Godot docs](https://docs.godotengine.org/).
+1. Start the backend with `asobi dev` (see above), and copy in the SDK.
+2. Open this project in Godot 4.5 and run it (F5), then pick **LOCAL** on the server
+   screen. Same on every OS. New to Godot? See the [Godot docs](https://docs.godotengine.org/).
 
 ## Architecture
 

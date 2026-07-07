@@ -21,21 +21,27 @@ Top-down arena shooter demo for the [Asobi](https://github.com/widgrensit/asobi)
    cd asobi_arena_lua && docker compose up -d
    ```
 
-   Server listens on `http://localhost:8085`. (This demo plays the *full* arena game — boons, modifiers, voting, bots — so it needs the arena Lua, not the minimal [`sdk_demo_backend`](https://github.com/widgrensit/sdk_demo_backend).)
+   Server listens on `http://localhost:8085`. (This demo plays the *full* arena game - boons, modifiers, voting, bots - so it needs the arena Lua, not the minimal [`sdk_demo_backend`](https://github.com/widgrensit/sdk_demo_backend).) On Windows and macOS this needs Docker Desktop running; on Windows use the WSL2 backend.
 
 ### Install SDK
 
-Symlink or copy the asobi-godot SDK into the `addons/` directory:
+Add the [`asobi-godot`](https://github.com/widgrensit/asobi-godot) SDK's `addons/asobi`
+into this project's `addons/` directory. Clone the SDK next to this demo, then **copy
+it in - works on every OS with no admin rights:**
 
-```bash
-ln -s /path/to/asobi-godot/addons/asobi addons/asobi
-```
+- Windows (PowerShell): `Copy-Item -Recurse ..\asobi-godot\addons\asobi addons\asobi`
+- Linux / macOS: `cp -r ../asobi-godot/addons/asobi addons/asobi`
+
+If you plan to edit the SDK in place, link it instead of copying:
+
+- Windows (Developer Mode or admin), cmd: `mklink /J addons\asobi C:\path\to\asobi-godot\addons\asobi`
+- Linux / macOS: `ln -s /path/to/asobi-godot/addons/asobi addons/asobi`
 
 ### Run
 
 1. Make sure `asobi_arena_lua` is up (see Prerequisites).
-2. Open this project in Godot 4.5.
-3. Press F5 to run.
+2. Open this project in Godot 4.5 and run it (F5). This is the same on every OS. New
+   to Godot? See the [Godot docs](https://docs.godotengine.org/).
 
 ## Architecture
 
